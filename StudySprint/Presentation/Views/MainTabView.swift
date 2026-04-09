@@ -2,14 +2,26 @@
 //  MainTabView.swift
 //  StudySprint
 //
-//  Created by Rene Torres on 8/4/26.
-//
 
 import SwiftUI
 
 struct MainTabView: View {
+    @State private var selectedTab = 0
+    
     var body: some View {
-        Text(/*@START_MENU_TOKEN@*/"Hello, World!"/*@END_MENU_TOKEN@*/)
+        TabView(selection: $selectedTab) {
+            CategoriesView()
+                .tabItem {
+                    Label("Materias", systemImage: "folder")
+                }
+                .tag(0)
+            
+            StatisticsView()
+                .tabItem {
+                    Label("Estadísticas", systemImage: "chart.bar")
+                }
+                .tag(1)
+        }
     }
 }
 

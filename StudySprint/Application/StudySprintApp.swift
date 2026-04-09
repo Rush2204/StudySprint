@@ -2,19 +2,17 @@
 //  StudySprintApp.swift
 //  StudySprint
 //
-//  Created by Rene Torres on 8/4/26.
-//
 
 import SwiftUI
-import CoreData
+internal import CoreData
 
 @main
 struct StudySprintApp: App {
     let persistenceController = PersistenceController.shared
-
+    
     var body: some Scene {
         WindowGroup {
-            ContentView()
+            MainTabView()
                 .environment(\.managedObjectContext, persistenceController.container.viewContext)
         }
     }
