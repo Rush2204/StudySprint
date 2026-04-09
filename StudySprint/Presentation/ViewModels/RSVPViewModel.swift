@@ -70,7 +70,7 @@ class RSVPViewModel: ObservableObject {
         pause()
         currentIndex = 0
         updateCurrentWord()
-        play()
+        
     }
     
     func updateWPM(_ newWPM: Int) {
@@ -83,6 +83,18 @@ class RSVPViewModel: ObservableObject {
         if wasPlaying {
             play()
         }
+    }
+    
+    func highlightedWord(_ word: String) -> (before: String, middle: String, after: String) {
+        let length = word.count
+        guard length > 0 else { return ("", "", "") }
+        
+        let middleIndex = length / 2
+        let beforeMiddle = String(word.prefix(middleIndex))
+        let middleLetter = String(word[word.index(word.startIndex, offsetBy: middleIndex)])
+        let afterMiddle = String(word.suffix(length - middleIndex - 1))
+        
+        return (beforeMiddle, middleLetter, afterMiddle)
     }
     
     private func updateCurrentWord() {

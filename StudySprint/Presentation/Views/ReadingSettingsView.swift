@@ -25,7 +25,7 @@ struct ReadingSettingsView: View {
                     VStack(spacing: 15) {
                         HStack {
                             
-                            Slider(value: $wpm, in: Double(AppConstants.minWPM)...Double(AppConstants.maxWPM), step: 10)
+                            Slider(value: $wpm, in: Double(AppConstants.minWPM)...Double(AppConstants.maxWPM), step: 50)
                             
                         }
                         

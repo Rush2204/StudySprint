@@ -56,14 +56,20 @@ struct RSVPReaderView: View {
                 
                 Spacer()
                 
-                Text(currentWord)
-                    .font(.system(size: CGFloat(currentFontSize), weight: .medium, design: .rounded))
-                    .foregroundColor(.white)
-                    .multilineTextAlignment(.center)
-                    .padding(.horizontal)
-                    .animation(.easeInOut(duration: 0.1), value: currentWord)
-                
-                Spacer()
+                HStack(spacing: 0) {
+                     Text(viewModel.highlightedWord(currentWord).before)
+                          .foregroundColor(.white)
+                     Text(viewModel.highlightedWord(currentWord).middle)
+                          .foregroundColor(.red)
+                     Text(viewModel.highlightedWord(currentWord).after)
+                          .foregroundColor(.white)
+                }
+                .font(.system(size: CGFloat(currentFontSize), weight: .medium, design: .rounded))
+                .multilineTextAlignment(.center)
+                .padding(.horizontal)
+                .animation(.easeInOut(duration: 0.1), value: currentWord)
+                                
+                 Spacer()
                 
                 VStack(spacing: 5) {
                     ProgressView(value: viewModel.progress)
@@ -108,7 +114,7 @@ struct RSVPReaderView: View {
                         viewModel.restart()
                     } label: {
                         Label("Reiniciar", systemImage: "arrow.counterclockwise")
-                            .font(.caption)
+                            .font(.system(size: 17))
                     }
                     
                     Button {
@@ -116,7 +122,7 @@ struct RSVPReaderView: View {
                         showingRating = true
                     } label: {
                         Label("Finalizar", systemImage: "checkmark.circle")
-                            .font(.caption)
+                            .font(.system(size: 17))
                     }
                 }
                 .foregroundColor(.gray)
@@ -175,7 +181,8 @@ struct RSVPReaderView: View {
                     }
                 }
             }
-        }
+        }.toolbar(.hidden, for: .tabBar)
+            
     }
 }
 
