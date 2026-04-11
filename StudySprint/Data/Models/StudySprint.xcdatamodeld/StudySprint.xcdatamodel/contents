@@ -19,6 +19,7 @@
         <attribute name="content" attributeType="String"/>
         <attribute name="fontSize" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="id" attributeType="UUID" usesScalarValueType="NO"/>
+        <attribute name="isMetronomeEnabled" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
         <attribute name="lastReadAt" optional="YES" attributeType="Date" usesScalarValueType="NO"/>
         <attribute name="musicTrack" optional="YES" attributeType="String"/>
         <attribute name="progressIndex" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES"/>

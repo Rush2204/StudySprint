@@ -15,10 +15,11 @@ struct StudyTextEntity: Identifiable, Equatable {
     var lastReadAt: Date?
     var progressIndex: Int
     let sessionId: UUID
+    var isMetronomeEnabled: Bool
     
     init(id: UUID = UUID(), content: String, wpm: Int = 250, fontSize: Int = 24,
          musicTrack: String? = nil, rating: Double = 0, lastReadAt: Date? = nil,
-         progressIndex: Int = 0, sessionId: UUID) {
+         progressIndex: Int = 0, sessionId: UUID, isMetronomeEnabled: Bool = false) {
         self.id = id
         self.content = content
         self.wpm = wpm
@@ -28,5 +29,6 @@ struct StudyTextEntity: Identifiable, Equatable {
         self.lastReadAt = lastReadAt
         self.progressIndex = progressIndex
         self.sessionId = sessionId
+        self.isMetronomeEnabled = isMetronomeEnabled
     }
 }

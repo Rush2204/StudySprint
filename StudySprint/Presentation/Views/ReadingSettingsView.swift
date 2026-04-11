@@ -10,6 +10,7 @@ struct ReadingSettingsView: View {
     
     @Binding var wpm: Double
     @Binding var fontSize: Double
+    @Binding var isMetronomeEnabled: Bool 
     let onSave: () -> Void
     
     @State private var previewText = AppConstants.previewText
@@ -116,6 +117,16 @@ struct ReadingSettingsView: View {
                         }
                     }
                     .padding(.vertical, 5)
+                }
+                Section("Metrónomo") {
+                    Toggle("Activar metrónomo", isOn: $isMetronomeEnabled)
+                        .tint(.orange)
+                    
+                    if isMetronomeEnabled {
+                        Text("Sonará un tick por cada palabra a \(Int(wpm)) ppm")
+                            .font(.caption)
+                            .foregroundColor(.gray)
+                    }
                 }
                 
                 Section {

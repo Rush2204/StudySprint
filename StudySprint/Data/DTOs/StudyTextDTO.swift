@@ -15,6 +15,7 @@ struct StudyTextDTO {
     let lastReadAt: Date?
     let progressIndex: Int32
     let sessionId: UUID
+    let isMetronomeEnabled: Bool
     
     func toEntity() -> StudyTextEntity {
         return StudyTextEntity(
@@ -26,7 +27,8 @@ struct StudyTextDTO {
             rating: rating,
             lastReadAt: lastReadAt,
             progressIndex: Int(progressIndex),
-            sessionId: sessionId
+            sessionId: sessionId,
+            isMetronomeEnabled: isMetronomeEnabled
         )
     }
     
@@ -40,7 +42,8 @@ struct StudyTextDTO {
             rating: entity.rating,
             lastReadAt: entity.lastReadAt,
             progressIndex: Int32(entity.progressIndex),
-            sessionId: entity.sessionId
+            sessionId: entity.sessionId,
+            isMetronomeEnabled: entity.isMetronomeEnabled
         )
     }
 }

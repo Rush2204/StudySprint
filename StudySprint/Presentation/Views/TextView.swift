@@ -14,6 +14,30 @@ struct TextView: View {
     @State private var showingSettings = false
     @State private var manualText = ""
     @State private var navigateToReader = false
+    @State private var showingEditSheet = false
+    @State private var isMetronomeEnabled: Bool = false
+    
+    // 🔽 Bindings simplificados
+    private var wpmBinding: Binding<Double> {
+        Binding(
+            get: { Double(viewModel.wpm) },
+            set: { viewModel.wpm = Int($0) }
+        )
+    }
+    
+    private var fontSizeBinding: Binding<Double> {
+        Binding(
+            get: { Double(viewModel.fontSize) },
+            set: { viewModel.fontSize = Int($0) }
+        )
+    }
+    
+    private var metronomeBinding: Binding<Bool> {
+        Binding(
+            get: { viewModel.isMetronomeEnabled },
+            set: { viewModel.toggleMetronome($0) }
+        )
+    }
     
     init(sessionId: UUID) {
         self.sessionId = sessionId
@@ -51,7 +75,7 @@ struct TextView: View {
                             } label: {
                                 Label("Configurar", systemImage: "slider.horizontal.3")
                                     .frame(maxWidth: .infinity)
-                                    .padding(12)
+                                    .padding(13)
                                     .background(Color.blue)
                                     .foregroundColor(.white)
                                     .cornerRadius(12)
@@ -62,8 +86,21 @@ struct TextView: View {
                             } label: {
                                 Label("Iniciar Lectura", systemImage: "play.circle.fill")
                                     .frame(maxWidth: .infinity)
-                                    .padding(12)
+                                    .padding(13)
                                     .background(Color.green)
+                                    .foregroundColor(.white)
+                                    .cornerRadius(12)
+                            }
+                        }
+                        
+                        if !text.content.hasPrefix("--- Página") {
+                            Button {
+                                showingEditSheet = true
+                            } label: {
+                                Label("Editar Texto", systemImage: "pencil")
+                                    .frame(maxWidth: .infinity)
+                                    .padding()
+                                    .background(Color.orange)
                                     .foregroundColor(.white)
                                     .cornerRadius(12)
                             }
@@ -146,26 +183,33 @@ struct TextView: View {
         }
         .sheet(isPresented: $showingSettings) {
             ReadingSettingsView(
-                wpm: Binding(
-                    get: { Double(viewModel.wpm) },
-                    set: { viewModel.wpm = Int($0) }
-                ),
-                fontSize: Binding(
-                    get: { Double(viewModel.fontSize) },
-                    set: { viewModel.fontSize = Int($0) }
-                ),
+                wpm: wpmBinding,
+                fontSize: fontSizeBinding,
+                isMetronomeEnabled: metronomeBinding,
                 onSave: {
-                    viewModel.saveSettings()
+                    viewModel.saveSettings()  
                 }
             )
+        }
+        .sheet(isPresented: $showingEditSheet) {
+            TextEditView(originalText: viewModel.studyText?.content ?? "") { newText in
+                viewModel.updateManualText(newText)
+            }
         }
         .background(
             NavigationLink(
                 destination: RSVPReaderView(
                     sessionId: sessionId,
                     textContent: viewModel.studyText?.content ?? "",
-                    wpm: viewModel.wpm,
+                    wpm: Binding(
+                                get: { viewModel.wpm },
+                                set: { newValue in
+                                    viewModel.wpm = newValue
+                                    viewModel.saveSettings()
+                                }
+                            ),
                     fontSize: viewModel.fontSize,
+                    isMetronomeEnabled: viewModel.isMetronomeEnabled, 
                     onComplete: { rating in
                         if var text = viewModel.studyText {
                             text.rating = rating

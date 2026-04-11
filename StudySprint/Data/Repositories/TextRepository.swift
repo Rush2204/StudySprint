@@ -29,7 +29,8 @@ class TextRepository: TextRepositoryProtocol {
                             rating: text.rating,
                             lastReadAt: text.lastReadAt,
                             progressIndex: Int(text.progressIndex),
-                            sessionId: sessionId
+                            sessionId: sessionId,
+                            isMetronomeEnabled: text.isMetronomeEnabled
                         )
                         return Just(entity).setFailureType(to: Error.self).eraseToAnyPublisher()
                     }
@@ -69,6 +70,7 @@ class TextRepository: TextRepositoryProtocol {
                         existing.rating = text.rating
                         existing.lastReadAt = text.lastReadAt
                         existing.progressIndex = Int32(text.progressIndex)
+                        existing.isMetronomeEnabled = text.isMetronomeEnabled
                         return self.dataSource.saveContext()
                             .map { text }
                             .eraseToAnyPublisher()
@@ -113,7 +115,8 @@ class TextRepository: TextRepositoryProtocol {
                                     rating: text.rating,
                                     lastReadAt: text.lastReadAt,
                                     progressIndex: Int(text.progressIndex),
-                                    sessionId: session.id ?? UUID()
+                                    sessionId: session.id ?? UUID(),
+                                    isMetronomeEnabled: text.isMetronomeEnabled
                                 )
                                 texts.append(entity)
                             }

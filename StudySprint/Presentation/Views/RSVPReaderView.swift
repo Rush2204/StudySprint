@@ -8,12 +8,14 @@ import SwiftUI
 struct RSVPReaderView: View {
     let sessionId: UUID
     let textContent: String
-    let wpm: Int
+    @Binding var wpm: Int
     let fontSize: Int
+    let isMetronomeEnabled: Bool
     let onComplete: (Double) -> Void
     
     @Environment(\.dismiss) private var dismiss
     @StateObject private var viewModel: RSVPViewModel
+    @StateObject private var metronome = MetronomeService()
     @State private var showingRating = false
     @State private var showingQuickSettings = false
     @State private var rating: Double = 0
@@ -21,15 +23,16 @@ struct RSVPReaderView: View {
     @State private var currentWPM: Int
     @State private var currentFontSize: Int
     
-    init(sessionId: UUID, textContent: String, wpm: Int, fontSize: Int, onComplete: @escaping (Double) -> Void) {
+    init(sessionId: UUID, textContent: String, wpm: Binding<Int>, fontSize: Int,isMetronomeEnabled enabled: Bool, onComplete: @escaping (Double) -> Void) {
         self.sessionId = sessionId
         self.textContent = textContent
-        self.wpm = wpm
+        self._wpm = wpm
         self.fontSize = fontSize
+        self.isMetronomeEnabled = enabled
         self.onComplete = onComplete
-        _currentWPM = State(initialValue: wpm)
+        _currentWPM = State(initialValue: wpm.wrappedValue)
         _currentFontSize = State(initialValue: fontSize)
-        _viewModel = StateObject(wrappedValue: RSVPViewModel(words: textContent.words, wpm: wpm))
+        _viewModel = StateObject(wrappedValue: RSVPViewModel(words: textContent.words, wpm: wpm.wrappedValue))
     }
     
     var body: some View {
@@ -105,6 +108,7 @@ struct RSVPReaderView: View {
                         Image(systemName: "forward.fill")
                             .font(.title)
                     }
+                    
                 }
                 .foregroundColor(.white)
                 .padding(.bottom, 30)
@@ -131,6 +135,18 @@ struct RSVPReaderView: View {
         }
         .onAppear {
             currentWord = viewModel.currentWord
+            currentWPM = viewModel.currentWPM 
+            
+            // Configurar metrónomo según preferencia del usuario
+                        metronome.setEnabled(isMetronomeEnabled)
+                        metronome.setBPM(currentWPM)
+                        
+                        // Si el metrónomo está activado y la lectura está reproduciendo, iniciar
+                        if isMetronomeEnabled && viewModel.isPlaying {
+                            metronome.start()
+                        }
+            
+            currentWord = viewModel.currentWord
             viewModel.onWordChange = { word in
                 currentWord = word
             }
@@ -141,8 +157,25 @@ struct RSVPReaderView: View {
         }
         .onDisappear {
             viewModel.pause()
+            metronome.stop()
         }
-        
+        .onChange(of: wpm) { newWPM in
+            currentWPM = newWPM
+            viewModel.updateWPM(newWPM)
+            metronome.setBPM(newWPM)
+        }
+
+        .onChange(of: currentWPM) { newValue in
+            metronome.setBPM(newValue)
+        }
+
+        .onChange(of: viewModel.isPlaying) { isPlaying in
+            if isPlaying && isMetronomeEnabled {
+                metronome.start()
+            } else {
+                metronome.stop()
+            }
+        }
         .sheet(isPresented: $showingRating) {
             NavigationView {
                 Form {
