@@ -107,7 +107,7 @@ struct TextView: View {
                         }
                         
                         Button(role: .destructive) {
-                            viewModel.deleteText()
+                            viewModel.showDeleteConfirmation = true
                         } label: {
                             Label("Eliminar Texto", systemImage: "trash")
                                 .frame(maxWidth: .infinity)
@@ -227,6 +227,14 @@ struct TextView: View {
             Button("OK") { }
         } message: {
             Text(viewModel.errorMessage ?? "")
+        }
+        .alert("¿Eliminar contenido?", isPresented: $viewModel.showDeleteConfirmation) {
+            Button("Eliminar", role: .destructive) {
+                viewModel.deleteText() 
+            }
+            Button("Cancelar", role: .cancel) { }
+        } message: {
+            Text("Esta acción eliminará permanentemente el texto de esta sesión. ¿Deseas continuar?")
         }
     }
 }

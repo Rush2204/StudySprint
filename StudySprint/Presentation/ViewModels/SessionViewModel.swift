@@ -40,6 +40,10 @@ class SessionViewModel: ObservableObject {
     
     func createSession(name: String, description: String?) {
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        if let desc = description, desc.count > 200 {
+                self.errorMessage = "La descripción no puede exceder los 200 caracteres"
+                return
+            }
         
         useCases.createSession(name: name, description: description, categoryId: categoryId)
             .receive(on: DispatchQueue.main)
@@ -54,6 +58,10 @@ class SessionViewModel: ObservableObject {
     }
     
     func updateSession(_ session: SessionEntity, name: String, description: String?) {
+        if let desc = description, desc.count > 200 {
+                self.errorMessage = "La descripción es demasiado larga (máx. 200)"
+                return
+            }
         var updated = session
         updated.name = name
         updated.description = description

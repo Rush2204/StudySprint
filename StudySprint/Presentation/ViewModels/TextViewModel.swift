@@ -15,6 +15,8 @@ class TextViewModel: ObservableObject {
     @Published var wpm: Int = AppConstants.defaultWPM
     @Published var fontSize: Int = AppConstants.defaultFontSize
     @Published var isMetronomeEnabled: Bool = false
+    @Published var showDeleteConfirmation: Bool = false
+    
     
     private let useCases: TextUseCasesProtocol
     private let sessionId: UUID
@@ -105,9 +107,13 @@ class TextViewModel: ObservableObject {
         updateText(text)
     }
     
+    func confirmDeletion() {
+        guard studyText != nil else { return }
+        self.showDeleteConfirmation = true
+    }
+    
     func deleteText() {
-        guard let text = studyText else { return }
-        useCases.deleteText(id: text.id)
+        useCases.deleteText(id: sessionId)
             .receive(on: DispatchQueue.main)
             .sink { [weak self] completion in
                 if case .failure(let error) = completion {

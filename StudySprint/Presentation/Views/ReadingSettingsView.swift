@@ -107,13 +107,7 @@ struct ReadingSettingsView: View {
                                     .cornerRadius(10)
                             }
                             
-                            if isPreviewPlaying {
-                                Button("Detener") {
-                                    stopPreview()
-                                }
-                                .buttonStyle(.borderedProminent)
-                                .tint(.red)
-                            }
+
                         }
                     }
                     .padding(.vertical, 5)

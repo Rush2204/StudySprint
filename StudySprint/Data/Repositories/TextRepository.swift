@@ -5,6 +5,7 @@
 
 import Foundation
 import Combine
+internal import CoreData
 
 class TextRepository: TextRepositoryProtocol {
     private let dataSource: LocalDataSource
@@ -81,21 +82,21 @@ class TextRepository: TextRepositoryProtocol {
             .eraseToAnyPublisher()
     }
     
-    func deleteText(id: UUID) -> AnyPublisher<Void, Error> {
-        return dataSource.fetchCategories()
-            .flatMap { categories -> AnyPublisher<Void, Error> in
-                for category in categories {
-                    if let sessions = category.sessions?.allObjects as? [SessionMO] {
-                        for session in sessions {
-                            if let text = session.studyText, text.id == id {
-                                return self.dataSource.deleteObject(text)
-                            }
-                        }
-                    }
-                }
+    func deleteText(sessionId: UUID) -> AnyPublisher<Void, Error> {
+        let request: NSFetchRequest<SessionMO> = SessionMO.fetchRequest()
+        request.predicate = NSPredicate(format: "id == %@", sessionId as CVarArg)
+        do {
+            if let session = try dataSource.viewContext.fetch(request).first,
+               let text = session.studyText {
+                dataSource.viewContext.delete(text)
+                try dataSource.viewContext.save()
+                return Just(()).setFailureType(to: Error.self).eraseToAnyPublisher()
+            } else {
                 return Fail(error: NSError(domain: "", code: 404)).eraseToAnyPublisher()
             }
-            .eraseToAnyPublisher()
+        } catch {
+            return Fail(error: error).eraseToAnyPublisher()
+        }
     }
     
     func getAllTexts() -> AnyPublisher<[StudyTextEntity], Error> {

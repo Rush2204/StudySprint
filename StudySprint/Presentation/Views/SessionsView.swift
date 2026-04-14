@@ -25,7 +25,13 @@ struct SessionsView: View {
         Group {
             if viewModel.isLoading {
                 ProgressView("Cargando...")
-            } else {
+            } else if viewModel.sessions.isEmpty {
+                ContentUnavailableView {
+                    Label("No hay sesiones", systemImage: "deskclock.fill")
+                } description: {
+                    Text("Crea tu primera sesión de estudio para comenzar.")
+                }
+            }else {
                 List {
                     ForEach(viewModel.sessions) { session in
                         NavigationLink(destination: TextView(sessionId: session.id)) {
@@ -81,11 +87,40 @@ struct SessionsView: View {
         .sheet(isPresented: $showingAddSession) {
             NavigationView {
                 Form {
-                    TextField("Nombre", text: $newSessionName)
-                    TextField("Descripción (opcional)", text: $newSessionDescription)
+                    Section {
+                        TextField("Nombre", text: $newSessionName)
+                            .onChange(of: newSessionName) { oldValue, newValue in
+                                if newValue.count > 70 { // Límite para nombre
+                                    newSessionName = String(newValue.prefix(70))
+                                }
+                            }
+                        
+                        VStack(alignment: .trailing) {
+                            TextField("Descripción (opcional)", text: $newSessionDescription, axis: .vertical)
+                                .lineLimit(3...5)
+                                .onChange(of: newSessionDescription) { oldValue, newValue in
+                                    if newValue.count > 200 {
+                                        newSessionDescription = String(newValue.prefix(200))
+                                    }
+                                }
+                            // Contador de caracteres dinámico
+                            if !newSessionDescription.isEmpty {
+                                    Text("\(newSessionDescription.count) / 200")
+                                        .font(.caption2)
+                                        .foregroundColor(newSessionDescription.count >= 200 ? .red : .gray)
+                                        .transition(.opacity) 
+                                }
+                        }
+                    } footer: {
+                        if newSessionDescription.count >= 200 {
+                            Text("Has alcanzado el límite máximo de caracteres.")
+                                .foregroundColor(.red)
+                                .font(.caption)
+                        }
+                    }
                 }
-                .navigationTitle(sessionToEdit == nil ? "Nueva Sesión" : "Editar Sesión")
-                .toolbar {
+                
+                .navigationTitle(sessionToEdit == nil ? "Nueva Sesión" : "Editar Sesión")                .toolbar {
                     ToolbarItem(placement: .cancellationAction) {
                         Button("Cancelar") {
                             showingAddSession = false

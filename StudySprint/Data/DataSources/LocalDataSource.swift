@@ -9,7 +9,7 @@ import Combine
 internal import CoreData
 
 final class LocalDataSource {
-    private let viewContext: NSManagedObjectContext
+    let viewContext: NSManagedObjectContext
     
     init(context: NSManagedObjectContext) {
         self.viewContext = context

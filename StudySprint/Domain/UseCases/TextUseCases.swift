@@ -40,7 +40,7 @@ class TextUseCases: TextUseCasesProtocol {
     }
     
     func deleteText(id: UUID) -> AnyPublisher<Void, Error> {
-        return repository.deleteText(id: id)
+        return repository.deleteText(sessionId: id)
     }
     
     func getAllTexts() -> AnyPublisher<[StudyTextEntity], Error> {

@@ -38,6 +38,10 @@ class CategoryViewModel: ObservableObject {
     
     func createCategory(name: String, description: String?) {
         guard !name.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+        if let desc = description, desc.count > 200 {
+                self.errorMessage = "La descripción es demasiado larga (máx. 200)"
+                return
+            }
         
         useCases.createCategory(name: name, description: description)
             .receive(on: DispatchQueue.main)
@@ -52,6 +56,10 @@ class CategoryViewModel: ObservableObject {
     }
     
     func updateCategory(_ category: CategoryEntity, name: String, description: String?) {
+        if let desc = description, desc.count > 200 {
+                self.errorMessage = "La descripción es demasiado larga (máx. 200)"
+                return
+            }
         var updated = category
         updated.name = name
         updated.description = description

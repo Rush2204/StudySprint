@@ -25,7 +25,15 @@ struct CategoriesView: View {
             Group {
                 if viewModel.isLoading {
                     ProgressView("Cargando...")
-                } else {
+                }else if viewModel.categories.isEmpty {
+                    // HIG: Estado vacío informativo y accionable
+                    ContentUnavailableView {
+                        Label("Sin Materias", systemImage: "book.closed.fill")
+                    } description: {
+                        Text("Comienza añadiendo las materias que vas a estudiar este ciclo.")
+                    }
+                }
+                else {
                     List {
                         ForEach(viewModel.categories) { category in
                             NavigationLink(destination: SessionsView(categoryId: category.id)) {
@@ -80,9 +88,41 @@ struct CategoriesView: View {
             }
             .sheet(isPresented: $showingAddCategory) {
                 NavigationView {
+                    
                     Form {
-                        TextField("Nombre", text: $newCategoryName)
-                        TextField("Descripción (opcional)", text: $newCategoryDescription)
+                        Section {
+                            TextField("Nombre", text: $newCategoryName)
+                                .onChange(of: newCategoryName) { oldValue, newValue in
+                                    if newValue.count > 70 { // Límite para nombre
+                                        newCategoryName = String(newValue.prefix(70))
+                                    }
+                                }
+                            
+                            VStack(alignment: .trailing) {
+                                TextField("Descripción (opcional)", text: $newCategoryDescription, axis: .vertical)
+                                    .lineLimit(3...5)
+                                    .onChange(of: newCategoryDescription) { oldValue, newValue in
+                                        if newValue.count > 200 {
+                                            newCategoryDescription = String(newValue.prefix(200))
+                                        }
+                                    }
+                                
+                                // Contador de caracteres dinámico
+                                if !newCategoryDescription.isEmpty {
+                                        Text("\(newCategoryDescription.count) / 200")
+                                            .font(.caption2)
+                                            .foregroundColor(newCategoryDescription.count >= 200 ? .red : .gray)
+                                            .transition(.opacity)
+                                    }
+
+                            }
+                        } footer: {
+                            if newCategoryDescription.count >= 200 {
+                                Text("Has alcanzado el límite máximo de caracteres.")
+                                    .foregroundColor(.red)
+                                    .font(.caption)
+                            }
+                        }
                     }
                     .navigationTitle(categoryToEdit == nil ? "Nueva Materia" : "Editar Materia")
                     .toolbar {
