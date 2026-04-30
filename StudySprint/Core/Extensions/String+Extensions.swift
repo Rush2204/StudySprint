@@ -29,4 +29,15 @@ extension String {
             .filter { !$0.trimmingCharacters(in: .whitespaces).isEmpty }
             .joined(separator: "\n")
     }
-}
+    
+    // Función para eliminar líneas que contienen "--- Página"
+    func removingPageMarkers() -> String {
+        let lines = self.components(separatedBy: .newlines)
+        let filteredLines = lines.filter { line in
+            let trimmed = line.trimmingCharacters(in: .whitespaces)
+            return !trimmed.hasPrefix("--- Página")
+        }
+        return filteredLines.joined(separator: "\n")
+    }
+    }
+

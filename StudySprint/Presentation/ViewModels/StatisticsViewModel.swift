@@ -35,7 +35,7 @@ class StatisticsViewModel: ObservableObject {
     }
     
     private func calculateStatistics(from texts: [StudyTextEntity]) -> StatisticsData? {
-        let completedTexts = texts.filter { $0.rating > 0 }
+        let completedTexts = texts.filter { $0.rating >= 0 }
         guard !completedTexts.isEmpty else { return nil }
         
         var totalWords = 0
