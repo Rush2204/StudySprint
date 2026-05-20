@@ -8,7 +8,8 @@ internal import CoreData
 import Combine
 
 struct StatisticsView: View {
-    @StateObject private var viewModel: StatisticsViewModel
+    @StateObject private var viewModel: StatisticsViewModel;
+    @State var showExplanations = false
     
     init() {
         let repository = TextRepository(dataSource: LocalDataSource(context: PersistenceController.shared.container.viewContext))
@@ -20,14 +21,14 @@ struct StatisticsView: View {
         NavigationView {
             Group {
                 if viewModel.isLoading {
-                    ProgressView("Cargando estadísticas...")
+                    ProgressView("Cargando Proyecciones...")
                 } else if let stats = viewModel.statistics {
                     List {
-                        Section("Resumen General") {
+                        Section("Resumen Estimado") {
                             StatRow(title: "Total de sesiones", value: "\(stats.totalSessions)")
                             StatRow(title: "Promedio de calificación", value: String(format: "%.1f / 10", stats.averageRating))
-                            StatRow(title: "Total de palabras leídas", value: "\(stats.totalWords)")
-                            StatRow(title: "Tiempo total de lectura", value: stats.totalReadingTime)
+                            StatRow(title: "Estimado de palabras leídas", value: "\(stats.totalWords)")
+                            StatRow(title: "Tiempo estimado de lectura", value: stats.totalReadingTime)
                         }
                         
                         Section("Por Velocidad (WPM)") {
@@ -51,14 +52,31 @@ struct StatisticsView: View {
                         Image(systemName: "chart.bar.xaxis")
                             .font(.system(size: 60))
                             .foregroundColor(.gray)
-                        Text("Completa tus primeras sesiones de lectura para ver estadísticas")
+                        Text("Completa tus primeras sesiones de lectura para ver tu análisis y proyecciones.")
                             .foregroundColor(.gray)
                             .multilineTextAlignment(.center)
                             .padding(.horizontal)
                     }
                 }
             }
-            .navigationTitle("Estadísticas")
+            .navigationTitle("Análisis y Proyecciones")
+            
+            .toolbar {
+                            ToolbarItem(placement: .navigationBarTrailing) {
+                                Button {
+                                    showExplanations.toggle()
+                                } label: {
+                                    Image(systemName: "questionmark.circle")
+                                        .foregroundColor(.accentColor)
+                                }
+                            }
+                        }
+                        
+                        .alert("Sobre tus Proyecciones", isPresented: $showExplanations) {
+                            Button("Entendido", role: .cancel) { }
+                        } message: {
+                            Text("Estos datos no son métricas exactas. Son estimaciones calculadas a partir de tus tiempos de lectura y patrones de rendimiento para ayudarte a visualizar tu progreso potencial.")
+                        }
         }
         .onAppear {
             viewModel.loadStatistics()

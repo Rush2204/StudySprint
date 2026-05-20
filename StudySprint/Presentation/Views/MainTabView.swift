@@ -18,7 +18,7 @@ struct MainTabView: View {
             
             StatisticsView()
                 .tabItem {
-                    Label("Estadísticas", systemImage: "chart.bar")
+                    Label("Rendimiento", systemImage: "chart.bar")
                 }
                 .tag(1)
         }
